@@ -40,6 +40,20 @@ namespace WDSSRP
             return dp;
         }
 
+        private void WriteSettings(DesktopProfile profile)
+        {
+            Registry.SetValue(DesktopSettingsRegistryPath, "FFlags", profile.FFlags, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "GroupByDirection", profile.GroupByDirection, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "GroupByKey:FMTID", profile.GroupByKey_FMTID, RegistryValueKind.String);
+            Registry.SetValue(DesktopSettingsRegistryPath, "GroupByKey:PID", profile.GroupByKey_PID, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "GroupView", profile.GroupView, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "IconLayouts", profile.IconLayouts, RegistryValueKind.Binary);
+            Registry.SetValue(DesktopSettingsRegistryPath, "IconSize", profile.IconSize, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "LogicalViewMode", profile.LogicalViewMode, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "Mode", profile.Mode, RegistryValueKind.DWord);
+            Registry.SetValue(DesktopSettingsRegistryPath, "Sort", profile.Sort, RegistryValueKind.Binary);
+        }
+
         private void btnSave_Click(object sender, EventArgs e)
         {
             dp = ReadSettings();
@@ -53,6 +67,11 @@ namespace WDSSRP
                 TextWriter writer = new StreamWriter(SavedProfilesDirectory+"\\New.xml");
                 xml.Serialize(writer, dp);
             }
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            WriteSettings(dp);
         }
     }
 }
