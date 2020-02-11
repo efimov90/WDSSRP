@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
@@ -14,6 +15,9 @@ namespace WDSSRP
 
         private DesktopProfile dp;
 
+        private Point MouseOffset;
+        private bool DraggingWindow = false;
+
         public MainForm()
         {
             InitializeComponent();
@@ -21,7 +25,10 @@ namespace WDSSRP
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            
+            foreach (var item in Directory.GetFiles(SavedProfilesDirectory, "*.xml", SearchOption.TopDirectoryOnly))
+            {
+                comboBox1.Items.Add(item);
+            }
         }
 
         private DesktopProfile ReadSettings()
@@ -71,7 +78,42 @@ namespace WDSSRP
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            WriteSettings(dp);
+            if (comboBox1.Text != "New")
+            {
+                string currentFile = comboBox1.SelectedItem.ToString();
+                if (File.Exists(currentFile))
+                {
+                    XmlSerializer xml = new XmlSerializer(typeof(DesktopProfile));
+                    TextReader reader = new StreamReader(currentFile);
+                    dp = xml.Deserialize(reader) as DesktopProfile;
+                    WriteSettings(dp);
+                }
+            }
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        {
+            MouseOffset.X = e.X;
+            MouseOffset.Y = e.Y;
+            DraggingWindow = true;
+        }
+
+        private void panel1_MouseUp(object sender, MouseEventArgs e)
+        {
+            DraggingWindow = false;
+        }
+
+        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (DraggingWindow)
+            {
+                this.SetDesktopLocation(MousePosition.X - MouseOffset.X, MousePosition.Y - MouseOffset.Y);
+            }
         }
     }
 }
