@@ -74,6 +74,8 @@ namespace WDSSRP
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            string filename = "Settings " + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss.fffffff");
+
             IntPtr lHwnd = FindWindow("Shell_TrayWnd", null);
             SendMessage(lHwnd, WM_COMMAND, (IntPtr)MIN_ALL, IntPtr.Zero);
             this.Hide();
@@ -82,7 +84,7 @@ namespace WDSSRP
                                        Screen.PrimaryScreen.Bounds.Height);
             Graphics graphics = Graphics.FromImage(bitmap as Image);
             graphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
-            bitmap.Save(SavedProfilesDirectory + "\\New.bmp");
+            bitmap.Save(SavedProfilesDirectory + "\\" + @filename + ".bmp");
             
             SendMessage(lHwnd, WM_COMMAND, (IntPtr)MIN_ALL_UNDO, IntPtr.Zero);
             this.Show();
@@ -95,7 +97,7 @@ namespace WDSSRP
                     Directory.CreateDirectory(SavedProfilesDirectory);
                 }
                 XmlSerializer xml = new XmlSerializer(typeof(DesktopProfile));
-                TextWriter writer = new StreamWriter(SavedProfilesDirectory+"\\New.xml");
+                TextWriter writer = new StreamWriter(SavedProfilesDirectory + "\\" + @filename + ".xml");
                 xml.Serialize(writer, dp);
             }
             
