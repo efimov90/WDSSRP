@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
@@ -17,6 +18,16 @@ namespace WDSSRP
 
         private Point MouseOffset;
         private bool DraggingWindow = false;
+
+
+        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
+        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        [DllImport("user32.dll", EntryPoint = "SendMessage", SetLastError = true)]
+        static extern IntPtr SendMessage(IntPtr hWnd, Int32 Msg, IntPtr wParam, IntPtr lParam);
+
+        const int WM_COMMAND = 0x111;
+        const int MIN_ALL = 419;
+        const int MIN_ALL_UNDO = 416;
 
         public MainForm()
         {
@@ -63,6 +74,19 @@ namespace WDSSRP
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            IntPtr lHwnd = FindWindow("Shell_TrayWnd", null);
+            SendMessage(lHwnd, WM_COMMAND, (IntPtr)MIN_ALL, IntPtr.Zero);
+            this.Hide();
+            System.Threading.Thread.Sleep(200);
+            Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
+                                       Screen.PrimaryScreen.Bounds.Height);
+            Graphics graphics = Graphics.FromImage(bitmap as Image);
+            graphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
+            bitmap.Save(SavedProfilesDirectory + "\\New.bmp");
+            
+            SendMessage(lHwnd, WM_COMMAND, (IntPtr)MIN_ALL_UNDO, IntPtr.Zero);
+            this.Show();
+
             dp = ReadSettings();
             if (comboBox1.Text=="New")
             {
@@ -74,6 +98,7 @@ namespace WDSSRP
                 TextWriter writer = new StreamWriter(SavedProfilesDirectory+"\\New.xml");
                 xml.Serialize(writer, dp);
             }
+            
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
