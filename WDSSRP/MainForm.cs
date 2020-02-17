@@ -19,6 +19,8 @@ namespace WDSSRP
         private Point MouseOffset;
         private bool DraggingWindow = false;
 
+        AboutBox AboutBox = new AboutBox();
+
 
         [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
         static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -141,6 +143,11 @@ namespace WDSSRP
             {
                 this.SetDesktopLocation(MousePosition.X - MouseOffset.X, MousePosition.Y - MouseOffset.Y);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AboutBox.ShowDialog();
         }
     }
 }
