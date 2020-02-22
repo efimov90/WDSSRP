@@ -49,28 +49,40 @@ namespace WDSSRP
             }
         }
 
-        private string SaveProfile()
+        private void makeScreenshot(string filename)
         {
-            string filename = "Settings " + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss.fffffff");
-
             IntPtr lHwnd = FindWindow("Shell_TrayWnd", null);
             SendMessage(lHwnd, WM_COMMAND, (IntPtr)MIN_ALL, IntPtr.Zero);
 
             this.Hide();
             System.Threading.Thread.Sleep(200);
-            Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
-                                       Screen.PrimaryScreen.Bounds.Height);
-            Graphics graphics = Graphics.FromImage(bitmap as Image);
-            graphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
-            bitmap.Save(SavedProfilesDirectory + "\\" + @filename + ".bmp");
+
+            using (Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
+                                              Screen.PrimaryScreen.Bounds.Height))
+            {
+                using (Graphics graphics = Graphics.FromImage(bitmap as Image))
+                {
+                    graphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
+                }
+
+                bitmap.Save(filename);
+            }
 
             SendMessage(lHwnd, WM_COMMAND, (IntPtr)MIN_ALL_UNDO, IntPtr.Zero);
             this.Show();
+        }
+
+        private string SaveProfile()
+        {
+            string filename = "Settings " + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss.fffffff");
 
             if (!Directory.Exists(SavedProfilesDirectory))
             {
                 Directory.CreateDirectory(SavedProfilesDirectory);
             }
+
+            makeScreenshot(SavedProfilesDirectory + "\\" + @filename + ".bmp");
+
             XmlSerializer xml = new XmlSerializer(typeof(DesktopProfile));
             TextWriter writer = new StreamWriter(SavedProfilesDirectory + "\\" + @filename + ".xml");
             xml.Serialize(writer, DesktopProfileModel.GetDesktopProfile());
