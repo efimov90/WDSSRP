@@ -11,13 +11,9 @@ namespace WDSSRP
     {
         private readonly string SavedProfilesDirectory = "Profiles";
 
-        private RegistryProfileModel DesktopProfileModel;
-
-        private Point MouseOffset;
-        private bool DraggingWindow = false;
+        private RegistryProfileModel DesktopProfileModel = new RegistryProfileModel();
 
         AboutBox AboutBox = new AboutBox();
-
 
         [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
         static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -103,26 +99,6 @@ namespace WDSSRP
         private void btnClose_Click(object sender, EventArgs e)
         {
             Close();
-        }
-
-        private void panel1_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseOffset.X = e.X;
-            MouseOffset.Y = e.Y;
-            DraggingWindow = true;
-        }
-
-        private void panel1_MouseUp(object sender, MouseEventArgs e)
-        {
-            DraggingWindow = false;
-        }
-
-        private void panel1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (DraggingWindow)
-            {
-                this.SetDesktopLocation(MousePosition.X - MouseOffset.X, MousePosition.Y - MouseOffset.Y);
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
